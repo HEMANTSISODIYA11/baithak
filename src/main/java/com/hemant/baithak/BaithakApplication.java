@@ -11,3 +11,10 @@ public class BaithakApplication {
 	}
 
 }
+
+
+//https://www.baeldung.com/java-websockets
+
+//https://spring.io/guides/gs/messaging-stomp-websocket
+
+//json or the jackson library to convert the json to java and vice versa
