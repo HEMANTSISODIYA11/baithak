@@ -19,15 +19,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
   @Override
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
     registry.addHandler(
-        chatHandler, "/ws/chat"
+        chatHandler, "/baithak/chat"
     ).setAllowedOrigins("*");
   }
 }
-
-// the server side will listen to it and we will be done
-// he already new it
-
-
-// target : create the chat application and deploy it
-// we will have the same whatsapp like structure for it if you want
-

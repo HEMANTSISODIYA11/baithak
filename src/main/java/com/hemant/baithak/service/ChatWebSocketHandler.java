@@ -3,6 +3,7 @@ package com.hemant.baithak.service;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -13,9 +14,10 @@ import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper;
 
   private final Map<String, Set<WebSocketSession>> roomSessions = new ConcurrentHashMap<>();
 
