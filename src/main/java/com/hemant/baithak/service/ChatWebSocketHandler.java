@@ -27,7 +27,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
   public void afterConnectionEstablished(
       WebSocketSession session
   ) throws Exception{
-      // do nothing
+      log.info("A new websocket connection has been established {}", session.getId());
   }
 
   @Override
@@ -35,6 +35,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
       WebSocketSession session,
       TextMessage message
   ) {
+
+
 
     log.info(
         "message received {}", message.getPayload()
@@ -52,9 +54,5 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
   ) {
 
   }
-
-
-
-
 
 }
