@@ -1,5 +1,6 @@
 package com.hemant.baithak.dto;
 
+import com.hemant.baithak.enums.MessageType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,8 +12,8 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TextMessagePayload {
+public class WebSocketMessage<T> {
 
-  private String meetId;
-  private String message;
+  private MessageType messageType;
+  T payload;
 }

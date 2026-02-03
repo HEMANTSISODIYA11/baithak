@@ -11,8 +11,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TextMessagePayload {
-
-  private String meetId;
+public class TextMessageResponse {
+  private String sender;
   private String message;
 }

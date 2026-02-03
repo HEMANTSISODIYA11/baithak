@@ -1,8 +1,7 @@
 package com.hemant.baithak.service;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import com.hemant.baithak.dto.WebSocketMessage;
+import com.hemant.baithak.service.handler.WebSocketMessageHandlerRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -10,6 +9,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
@@ -18,10 +18,7 @@ import tools.jackson.databind.ObjectMapper;
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
   private final ObjectMapper objectMapper;
-
-  private final Map<String, Set<WebSocketSession>> roomSessions = new ConcurrentHashMap<>();
-
-  private final Map<String, String> sessionToRoomInfo = new ConcurrentHashMap<>();
+  private final WebSocketMessageHandlerRegistry webSocketMessageHandlerRegistry;
 
   @Override
   public void afterConnectionEstablished(
@@ -36,15 +33,22 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
       TextMessage message
   ) {
 
+    WebSocketMessage<Object> textMessage = objectMapper.convertValue(
+        message.getPayload(),
+        new TypeReference<WebSocketMessage<Object>>() {
+        }
+    );
 
+    webSocketMessageHandlerRegistry.getWebSocketMessageHandler(
+        textMessage.getMessageType()
+    ).handle(
+        session,
+        textMessage.getPayload()
+    );
 
     log.info(
         "message received {}", message.getPayload()
     );
-  }
-
-  private void handleJoin() {
-
   }
 
   @Override
