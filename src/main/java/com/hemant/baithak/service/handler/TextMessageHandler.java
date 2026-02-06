@@ -39,7 +39,7 @@ public class TextMessageHandler implements WebSocketMessageHandler {
     );
 
     Set<Object> sessionIds = SetUtils.emptyIfNull(
-        redisClient.getObjectFromSet(
+        redisClient.getObjectsFromSet(
             String.format(Constants.MEETING_TO_SESSIONS_CACHE_KEY, textMessagePayload.getMeetId())
         )
     );

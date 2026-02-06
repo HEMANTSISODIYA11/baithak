@@ -77,7 +77,7 @@ public class RedisClient {
     return redissonSet.isExists();
   }
 
-  public Set<Object> getObjectFromSet(
+  public Set<Object> getObjectsFromSet(
       final String key
   ) {
 
@@ -86,6 +86,12 @@ public class RedisClient {
     return redissonSet.readAll();
   }
 
+  public boolean hasObjectInSet(
+      final String key, final Object setObject
+  ) {
 
+    RSet<Object> redissonSet = redissonClient.getSet(key);
+    return redissonSet.readAll().contains(setObject);
+  }
 
 }

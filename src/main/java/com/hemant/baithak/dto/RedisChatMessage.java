@@ -1,5 +1,6 @@
 package com.hemant.baithak.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,10 @@ import lombok.Setter;
 @Setter
 @Builder
 @NoArgsConstructor
-public class PingMessagePayload {
+@AllArgsConstructor
+public class RedisChatMessage {
 
+  public String webSocketSessionId;
+
+  public Object message;
 }

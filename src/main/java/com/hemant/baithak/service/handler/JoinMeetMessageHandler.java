@@ -66,4 +66,9 @@ public class JoinMeetMessageHandler implements
   public MessageType getMessageType() {
     return MessageType.JOIN;
   }
+
+  private boolean addListenerForChannel() {
+
+  }
+
 }

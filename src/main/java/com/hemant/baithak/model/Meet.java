@@ -15,8 +15,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
-@SequenceGenerator(name = "meet_primary_key_seq")
 public class Meet extends BaseEntity {
 
   private String meetId;
