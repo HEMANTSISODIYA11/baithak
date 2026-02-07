@@ -1,24 +1,24 @@
 package com.hemant.baithak.service;
 
 import com.hemant.baithak.dto.RedisChatMessage;
-import com.hemant.baithak.service.handler.TextMessageHandler;
+import com.hemant.baithak.service.handler.RedisChatMessageHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RedisSubscriber {
+public class RedisListener {
 
-  public final TextMessageHandler textMessageHandler;
+  public final RedisChatMessageHandler redisChatMessageHandler;
 
   public void listen(
-      final String channelId,
       final RedisChatMessage chatMessage
   ) {
 
-    t
-
-
+    redisChatMessageHandler.listenMessage(
+        chatMessage.webSocketSessionId,
+        chatMessage.getMessage()
+    );
   }
 
 }

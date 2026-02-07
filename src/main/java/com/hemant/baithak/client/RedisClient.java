@@ -2,6 +2,8 @@ package com.hemant.baithak.client;
 
 import static java.time.temporal.ChronoUnit.HOURS;
 
+import com.hemant.baithak.dto.RedisChatMessage;
+import com.hemant.baithak.service.RedisListener;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
@@ -9,7 +11,9 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBucket;
 import org.redisson.api.RSet;
+import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
+import org.redisson.api.listener.MessageListener;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,6 +21,7 @@ import org.springframework.stereotype.Component;
 public class RedisClient {
 
   private final RedissonClient redissonClient;
+  private final RedisListener redisListener;
 
   public void putObjectInKey(
       final String key, final Object object
@@ -92,6 +97,39 @@ public class RedisClient {
 
     RSet<Object> redissonSet = redissonClient.getSet(key);
     return redissonSet.readAll().contains(setObject);
+  }
+
+  public void publishInTopic(
+      final String channelId,
+      final Object payload
+  ) {
+
+    RTopic rTopic = redissonClient.getTopic(channelId);
+    rTopic.publish(
+        payload
+    );
+  }
+
+  public void subscribeToChannel(
+      final String channelId
+  ) {
+
+    RTopic rTopic = redissonClient.getTopic(
+        channelId
+    );
+
+    rTopic.addListener(
+        RedisChatMessage.class, new MessageListener<RedisChatMessage>() {
+
+
+          @Override
+          public void onMessage(CharSequence channel, RedisChatMessage chatMessage) {
+            redisListener.listen(
+                chatMessage
+            );
+          }
+        }
+    );
   }
 
 }

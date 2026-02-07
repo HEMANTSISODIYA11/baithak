@@ -6,7 +6,6 @@ import com.hemant.baithak.dto.JoinMeetMessagePayload;
 import com.hemant.baithak.enums.MessageType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.WebSession;
 import org.springframework.web.socket.WebSocketSession;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -40,6 +39,8 @@ public class JoinMeetMessageHandler implements
 //    MEETING_TO_SESSIONS_CACHE_KEY = "sessions:meet:%s";
 //    SESSION_TO_USER_NAME_CACHE_KEY = "session:%s:user";
 
+    addListenerForMeet(meetId);
+
     redisClient.putObjectInSet(
         Constants.MEETING_LIST_CACHE_KEY,
         meetId
@@ -59,7 +60,6 @@ public class JoinMeetMessageHandler implements
         String.format(Constants.SESSION_TO_USER_NAME_CACHE_KEY, sessionId), member
     );
 
-
   }
 
   @Override
@@ -67,7 +67,22 @@ public class JoinMeetMessageHandler implements
     return MessageType.JOIN;
   }
 
-  private boolean addListenerForChannel() {
+  private void addListenerForMeet(
+      final String meetId
+  ) {
+
+    boolean alreadySubscribed = redisClient.hasObjectInSet(
+        Constants.MEETING_LIST_CACHE_KEY,
+        meetId
+    );
+
+    if(alreadySubscribed) {
+      return;
+    }
+
+    redisClient.subscribeToChannel(
+        meetId
+    );
 
   }
 
