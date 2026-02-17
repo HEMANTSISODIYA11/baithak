@@ -1,6 +1,7 @@
 package com.hemant.baithak.service;
 
 import com.hemant.baithak.dto.WebSocketMessage;
+import com.hemant.baithak.repository.SessionRepository;
 import com.hemant.baithak.service.handler.WebSocketMessageHandlerRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +20,15 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
   private final ObjectMapper objectMapper;
   private final WebSocketMessageHandlerRegistry webSocketMessageHandlerRegistry;
+  private final SessionRepository sessionRepository;
 
   @Override
   public void afterConnectionEstablished(
       WebSocketSession session
   ) throws Exception{
+    sessionRepository.addWebSession(
+        session
+    );
       log.info("A new websocket connection has been established {}", session.getId());
   }
 
@@ -33,7 +38,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
       TextMessage message
   ) {
 
-    WebSocketMessage<Object> textMessage = objectMapper.convertValue(
+    WebSocketMessage<Object> textMessage = objectMapper.readValue(
         message.getPayload(),
         new TypeReference<WebSocketMessage<Object>>() {
         }
@@ -57,6 +62,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
       CloseStatus status
   ) {
 
+    sessionRepository.removeSession(
+        webSocketSession.getId()
+    );
+
+    log.info(
+        "session disconnected with {} with closing status as {}", webSocketSession.getId(), status
+    );
   }
 
 }

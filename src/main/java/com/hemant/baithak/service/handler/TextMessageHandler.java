@@ -1,9 +1,9 @@
 package com.hemant.baithak.service.handler;
 
-import com.hemant.baithak.client.RedisClient;
+
 import com.hemant.baithak.dto.TextMessagePayload;
 import com.hemant.baithak.enums.MessageType;
-import com.hemant.baithak.service.RedisPublisher;
+import com.hemant.baithak.client.RedisPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -15,9 +15,8 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class TextMessageHandler implements WebSocketMessageHandler {
 
-  private final RedisClient redisClient;
   private final ObjectMapper objectMapper;
-  public final RedisPublisher redisPublisher;
+  private final RedisPublisher redisPublisher;
 
   @Override
   @SneakyThrows

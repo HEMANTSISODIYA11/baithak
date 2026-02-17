@@ -3,22 +3,22 @@ package com.hemant.baithak.service;
 import com.hemant.baithak.dto.RedisChatMessage;
 import com.hemant.baithak.service.handler.RedisChatMessageHandler;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.listener.MessageListener;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RedisListener {
+public class RedisMessageListener implements
+    MessageListener<RedisChatMessage> {
 
-  public final RedisChatMessageHandler redisChatMessageHandler;
+  private final RedisChatMessageHandler redisChatMessageHandler;
 
-  public void listen(
-      final RedisChatMessage chatMessage
-  ) {
+  @Override
+  public void onMessage(CharSequence channel, RedisChatMessage chatMessage) {
 
     redisChatMessageHandler.listenMessage(
         chatMessage.webSocketSessionId,
         chatMessage.getMessage()
     );
   }
-
 }

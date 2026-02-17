@@ -4,6 +4,8 @@ import com.hemant.baithak.client.RedisClient;
 import com.hemant.baithak.constant.Constants;
 import com.hemant.baithak.dto.LeaveMeetPayload;
 import com.hemant.baithak.enums.MessageType;
+import com.hemant.baithak.repository.SessionRepository;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.WebSession;
@@ -17,6 +19,7 @@ public class LeaveMeetMessageHandler implements WebSocketMessageHandler{
 
   private final ObjectMapper objectMapper;
   private final RedisClient redisClient;
+  private final SessionRepository sessionRepository;
 
   @Override
   public void handle(WebSocketSession webSession, Object payload) {
@@ -30,12 +33,11 @@ public class LeaveMeetMessageHandler implements WebSocketMessageHandler{
     String meetId = messagePayload.getMeetId();
 
     // meets -> set(meetId)
-    // session:{sessionId} -> websession, TTL
     // sessions:meet:{meetId} -> set(session)
     // session:{session}:user -> name
 
-    redisClient.removeKey(
-        String.format(Constants.SESSION_CACHE_KEY, sessionId)
+    sessionRepository.removeSession(
+        sessionId
     );
 
     redisClient.removeObjectFromSet(

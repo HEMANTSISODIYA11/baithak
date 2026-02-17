@@ -1,15 +1,16 @@
 package com.hemant.baithak.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-@Entity(name = "meet")
+@Entity
+@Table(name = "meet")
 @Getter
 @Setter
 @SuperBuilder

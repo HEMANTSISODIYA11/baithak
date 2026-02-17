@@ -1,6 +1,5 @@
-package com.hemant.baithak.service;
+package com.hemant.baithak.client;
 
-import com.hemant.baithak.client.RedisClient;
 import com.hemant.baithak.dto.RedisChatMessage;
 import com.hemant.baithak.dto.TextMessagePayload;
 import lombok.RequiredArgsConstructor;

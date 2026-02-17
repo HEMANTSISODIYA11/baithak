@@ -4,6 +4,7 @@ import com.hemant.baithak.client.RedisClient;
 import com.hemant.baithak.constant.Constants;
 import com.hemant.baithak.dto.TextMessagePayload;
 import com.hemant.baithak.dto.TextMessageResponse;
+import com.hemant.baithak.repository.SessionRepository;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ public class RedisChatMessageHandler {
 
   private final RedisClient redisClient;
   private final ObjectMapper objectMapper;
+  private final SessionRepository sessionRepository;
 
   @SneakyThrows
   public void listenMessage(
@@ -41,16 +43,9 @@ public class RedisChatMessageHandler {
     );
 
     Set<WebSocketSession> webSocketSessions = SetUtils.emptyIfNull(sessionIds).stream().map(
-        sessionId -> redisClient.getObjectInKey(
-            String.format(Constants.SESSION_CACHE_KEY, sessionId)
-        )
+        sessionId -> sessionRepository.getWebSession((String) sessionId)
     ).filter(Optional::isPresent).map(
         Optional::get
-    ).map(
-        session -> objectMapper.convertValue(
-            session, new TypeReference<WebSocketSession>() {
-            }
-        )
     ).collect(Collectors.toSet());
 
     for(WebSocketSession webSocketSessionFromMeet : webSocketSessions) {
@@ -79,3 +74,6 @@ public class RedisChatMessageHandler {
   }
 
 }
+
+
+// i will have the locally unique listener ids

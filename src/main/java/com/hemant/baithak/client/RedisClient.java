@@ -2,18 +2,17 @@ package com.hemant.baithak.client;
 
 import static java.time.temporal.ChronoUnit.HOURS;
 
-import com.hemant.baithak.dto.RedisChatMessage;
-import com.hemant.baithak.service.RedisListener;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBucket;
+import org.redisson.api.RLock;
 import org.redisson.api.RSet;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
-import org.redisson.api.listener.MessageListener;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
 public class RedisClient {
 
   private final RedissonClient redissonClient;
-  private final RedisListener redisListener;
 
   public void putObjectInKey(
       final String key, final Object object
@@ -110,26 +108,11 @@ public class RedisClient {
     );
   }
 
-  public void subscribeToChannel(
-      final String channelId
-  ) {
-
-    RTopic rTopic = redissonClient.getTopic(
-        channelId
-    );
-
-    rTopic.addListener(
-        RedisChatMessage.class, new MessageListener<RedisChatMessage>() {
-
-
-          @Override
-          public void onMessage(CharSequence channel, RedisChatMessage chatMessage) {
-            redisListener.listen(
-                chatMessage
-            );
-          }
-        }
-    );
+  public RLock getLock(
+      final String key
+  ) throws InterruptedException {
+    RLock lock = redissonClient.getLock(key);
+    return lock;
   }
 
 }

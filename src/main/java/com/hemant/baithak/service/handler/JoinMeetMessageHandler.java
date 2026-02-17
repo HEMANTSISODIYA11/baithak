@@ -1,15 +1,21 @@
 package com.hemant.baithak.service.handler;
 
 import com.hemant.baithak.client.RedisClient;
+import com.hemant.baithak.client.RedisListener;
 import com.hemant.baithak.constant.Constants;
 import com.hemant.baithak.dto.JoinMeetMessagePayload;
 import com.hemant.baithak.enums.MessageType;
+import com.hemant.baithak.repository.SessionRepository;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JoinMeetMessageHandler implements
@@ -17,6 +23,8 @@ public class JoinMeetMessageHandler implements
 
   private final ObjectMapper objectMapper;
   private final RedisClient redisClient;
+  private final RedisListener redisListener;
+  private final SessionRepository sessionRepository;
 
   @Override
   public void handle(WebSocketSession webSession, Object payload) {
@@ -30,7 +38,6 @@ public class JoinMeetMessageHandler implements
     String member = messagePayload.getName();
 
     // meets -> set(meetId)
-    // session:{sessionId} -> websession, TTL
     // sessions:meet:{meetId} -> set(session)
     // session:{session}:user -> name
 
@@ -39,6 +46,9 @@ public class JoinMeetMessageHandler implements
 //    MEETING_TO_SESSIONS_CACHE_KEY = "sessions:meet:%s";
 //    SESSION_TO_USER_NAME_CACHE_KEY = "session:%s:user";
 
+//    public static final String SESSION_TO_MEET_ID_CACHE_KEY = "session:%s:meet";
+//    public static final String MEET_TO_SUBSCRIPTION_STATUS_CACHE_KEY = "meet:%s";
+
     addListenerForMeet(meetId);
 
     redisClient.putObjectInSet(
@@ -46,8 +56,7 @@ public class JoinMeetMessageHandler implements
         meetId
     );
 
-    redisClient.putObjectInKey(
-        String.format(Constants.SESSION_CACHE_KEY, sessionId),
+    sessionRepository.addWebSession(
         webSession
     );
 
@@ -71,16 +80,38 @@ public class JoinMeetMessageHandler implements
       final String meetId
   ) {
 
-    boolean alreadySubscribed = redisClient.hasObjectInSet(
+    boolean entryExists = redisClient.hasObjectInSet(
         Constants.MEETING_LIST_CACHE_KEY,
         meetId
     );
 
-    if(alreadySubscribed) {
+    if(entryExists) {
       return;
     }
 
-    redisClient.subscribeToChannel(
+    try {
+      RLock lock = redisClient.getLock(
+          String.format(Constants.MEET_TO_SUBSCRIPTION_STATUS_CACHE_KEY, meetId)
+      );
+
+      if(lock.tryLock(100, 10000, TimeUnit.MILLISECONDS)) {
+
+        try {
+
+          
+
+
+        } finally {
+          lock.unlock();
+        }
+      }
+    } catch (Exception exception) {
+      log.error(
+          "exception occurred while subscribing to the redis for meeting {}", meetId
+      );
+    }
+
+    redisListener.subscribeToChannel(
         meetId
     );
 
