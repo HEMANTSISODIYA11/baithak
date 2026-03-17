@@ -42,7 +42,6 @@ public class JoinMeetMessageHandler implements
     // session:{session}:user -> name
 
 //    MEETING_LIST_CACHE_KEY = "meeting";
-//    SESSION_CACHE_KEY = "session:%s";
 //    MEETING_TO_SESSIONS_CACHE_KEY = "sessions:meet:%s";
 //    SESSION_TO_USER_NAME_CACHE_KEY = "session:%s:user";
 
@@ -56,9 +55,11 @@ public class JoinMeetMessageHandler implements
         meetId
     );
 
-    sessionRepository.addWebSession(
-        webSession
-    );
+    if(!sessionRepository.hasSession(webSession.getId())) {
+      sessionRepository.addWebSession(
+          webSession
+      );
+    }
 
     redisClient.putObjectInSet(
         String.format(Constants.MEETING_TO_SESSIONS_CACHE_KEY, meetId),
@@ -68,7 +69,6 @@ public class JoinMeetMessageHandler implements
     redisClient.putObjectInKey(
         String.format(Constants.SESSION_TO_USER_NAME_CACHE_KEY, sessionId), member
     );
-
   }
 
   @Override
@@ -97,23 +97,20 @@ public class JoinMeetMessageHandler implements
       if(lock.tryLock(100, 10000, TimeUnit.MILLISECONDS)) {
 
         try {
-
-          
-
-
+          redisListener.subscribeToChannel(
+              meetId
+          );
         } finally {
           lock.unlock();
         }
       }
     } catch (Exception exception) {
       log.error(
-          "exception occurred while subscribing to the redis for meeting {}", meetId
+          "exception occurred while subscribing to the redis for meeting {}", meetId, exception
       );
-    }
 
-    redisListener.subscribeToChannel(
-        meetId
-    );
+      throw new RuntimeException(exception.getMessage());
+    }
 
   }
 

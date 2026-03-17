@@ -74,6 +74,3 @@ public class RedisChatMessageHandler {
   }
 
 }
-
-
-// i will have the locally unique listener ids
