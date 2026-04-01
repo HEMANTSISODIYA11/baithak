@@ -1,8 +1,10 @@
 package com.hemant.baithak.model;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 import java.sql.Timestamp;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -16,13 +18,13 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
+@MappedSuperclass
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class BaseEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long pk;
 
   @Default
